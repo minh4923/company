@@ -1,11 +1,26 @@
 const mongoose = require('mongoose');
 
 const postSchema = new mongoose.Schema({
-  title: String,
-  content: String,
-  userId: {
+  title:{
+      type: String,
+      minlength: 1, 
+      maxlength: 30,
+      required: true
+  } ,
+  content: {
+      type: String, 
+      minlength: 1,
+      maxlength: 6000,
+      required: true
+  },
+  author: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
+    ref: 'User',
+    required: true
+  },
+  createAt: {
+    type: Date,
+    default: Date.now
   }
 });
 

@@ -1,47 +1,51 @@
-// controllers/postController.js
-const Post = require('../models/Post');
+const postService = require('../services/postService');
 
 // Lấy tất cả bài đăng
-exports.getAllPosts = async (req, res) => {
+const getAllPosts = async (req, res) => {
+  const {page = 1, limit = 10} = req.query || {};
+  const parsedPage = parseInt(page, 10)||1;
+  const parsedLimit = parseInt(limit, 10)||10;
+
   try {
-    const posts = await Post.find().populate('userId');
+    
+    const posts = await postService.getAllPosts(parsedPage, parsedLimit);
     res.json(posts);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
 
-// Lấy một bài đăng cụ thể
-exports.getPostById = async (req, res) => {
+// Lấy một bài đăng theo ID
+const getPostById = async (req, res) => {
+  const { id } = req.params;
   try {
-    const post = await Post.findById(req.params.id).populate('userId');
-    if (!post) return res.status(404).json({ message: 'Post not found' });
+    const post = await postService.getPostById(id);
     res.json(post);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(404).json({ message: err.message });
   }
 };
 
 // Tạo mới một bài đăng
-exports.createPost = async (req, res) => { 
-  const post = new Post(req.body); // Nhận title, content, userId từ req.body
-  
+const createPost = async (req, res) => {
+  const { title, content } = req.body;
+  const token = req.headers['authorization']?.split(' ')[1];
+
   try {
-    const newPost = await post.save();
-    // Sử dụng .populate để lấy thông tin chi tiết của User mà không dùng execPopulate
-    await newPost.populate('userId'); // Thực hiện populate để lấy thông tin chi tiết của userId
-    res.status(201).json(newPost); // Trả về post đã populate
+    const newPost = await postService.createPost({ title, content }, token);
+    res.status(201).json(newPost);
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    res.status(401).json({ message: err.message });
   }
 };
+
 // Cập nhật một bài đăng
-exports.updatePost = async (req, res) => {
+const updatePost = async (req, res) => {
   const { id } = req.params;
+  const data = req.body;
+
   try {
-    const updatedPost = await Post.findByIdAndUpdate(id, req.body, { new: true });
-    if (!updatedPost) return res.status(404).json({ message: 'Post not found' });
-    await updatedPost.populate('userId');
+    const updatedPost = await postService.updatePost(id, data);
     res.json(updatedPost);
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -49,12 +53,29 @@ exports.updatePost = async (req, res) => {
 };
 
 // Xóa một bài đăng
-exports.deletePost = async (req, res) => {
+const deletePost = async (req, res) => {
+  const { id } = req.params;
+
   try {
-    const post = await Post.findByIdAndDelete(req.params.id);
-    if (!post) return res.status(404).json({ message: 'Post not found' });
+    await postService.deletePost(id);
     res.json({ message: 'Post deleted' });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(404).json({ message: err.message });
   }
 };
+
+// Lấy tất cả bài đăng của một người dùng
+const getUserPosts = async (req, res) => {
+  const { userId } = req.params;
+  const { page = 1, limit = 10} =  req.query || {};
+  const parsedPage = parseInt(page, 10)||1;
+  const parsedLimit = parseInt(limit, 10)||10;
+  try {
+    const userPosts = await postService.getUserPosts(userId, parsedPage, parsedLimit);
+    res.status(200).json(userPosts);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};
+
+module.exports = {getAllPosts, getPostById, createPost, updatePost, deletePost, getUserPosts};
