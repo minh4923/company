@@ -13,11 +13,11 @@ const postVerify =  async (req, res, next) => {
             return res.status(403).json({message: 'Access denied'});
             
         }
-        //Lấy id của post từ url
+
         const {id} =  req.params;
         const post = await  Post.findById(id);
         if(!post){
-                return  res.status(404).json({message: 'Post not found12'});
+                return  res.status(404).json({message: 'Post not found'});
         }
         if(req.role == "user" && post.author.toString() !== req.userId){
             return res.status(403).json({message: 'Acess denide: You are not the owner'});

@@ -67,6 +67,7 @@ const deletePost = async (req, res) => {
 // Lấy tất cả bài đăng của một người dùng
 const getUserPosts = async (req, res) => {
   const { userId } = req.params;
+  console.log(userId);
   const { page = 1, limit = 10} =  req.query || {};
   const parsedPage = parseInt(page, 10)||1;
   const parsedLimit = parseInt(limit, 10)||10;

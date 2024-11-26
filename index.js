@@ -9,7 +9,7 @@ dotenv.config();
 const  userRoutes = require('./routes/userRoutes');
 const  postRoutes = require('./routes/postRoutes');
 const  authRoutes = require('./routes/authRoutes');
-const PORT = 8000;
+const  PORT = process.env.PORT;
 
 const app = express();
 app.use(express.json()); // Đảm bảo rằng middleware này nằm trước các route

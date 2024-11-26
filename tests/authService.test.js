@@ -11,20 +11,20 @@ describe('Auth Service',() => {
     it('should throw an error if email is already userd', async () =>{
         User.findOne.mockResolvedValue({email: 'test@example.com'});
         await expect(authService.register({name: 'Test', email: 'test@example.com', password: '123123' }))
-        .rejects.toThrow('Email đã được sử dụng');
+        .rejects.toThrow('Email has been used');
     });
     it('should register a user successfully', async () => {
         User.findOne.mockResolvedValue(null);
         bcrypt.hash.mockResolvedValue('hashedPassword');
         User.prototype.save = jest.fn().mockResolvedValue(true);
         const result = await authService.register({name:'Test', email:'test@example.com',password: '123123'});
-        expect(result).toEqual({message: 'Đăng ký thành công!'});
+        expect(result).toEqual({message: 'Registered successfully!'});
     });
     // Test hàm login khi người dùng không tồn tại
     it('should throw an error if user is not found', async () => {
         User.findOne.mockResolvedValue(null);
         await expect(authService.login({email: 'test@example.com',password: '123123'}))
-        .rejects.toThrow('Người dùng không tồn tại');
+        .rejects.toThrow('User does not exist');
         
     });
     //Test khi mật khẩu sai 
@@ -32,7 +32,7 @@ describe('Auth Service',() => {
         User.findOne.mockResolvedValue({password: 'hashedPasswork'});
         bcrypt.compare.mockResolvedValue(false);
         await expect(authService.login({email: 'test@example.com' ,password:'123123'}))
-         .rejects.toThrow('Mật khẩu không chính xác'); 
+         .rejects.toThrow('Password is incorrect'); 
     });
     //Test khi mật khẩu đúng
     it('should return a token for valid login', async() =>{
@@ -40,7 +40,7 @@ describe('Auth Service',() => {
         bcrypt.compare.mockResolvedValue(true);
         jwt.sign.mockReturnValue('testToken');
         const result = await authService.login({email:'test@example.com', password:'123456'});
-        expect(result).toEqual({token: 'testToken', message:'Đăng nhập thành công'});
+        expect(result).toEqual({token: 'testToken', message:'Log in successfully'});
     });
     
 });

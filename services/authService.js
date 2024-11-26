@@ -9,7 +9,7 @@ class AuthService {
     // Kiểm tra nếu email đã tồn tại
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      throw new Error('Email đã được sử dụng');
+      throw new Error('Email has been used');
     }
 
     // Mã hóa mật khẩu
@@ -19,7 +19,7 @@ class AuthService {
     const user = new User({ name, email, password: hashedPassword });
     await user.save();
 
-    return { message: 'Đăng ký thành công!' };
+    return { message: 'Registered successfully!' };
   }
 
   // Đăng nhập người dùng
@@ -27,13 +27,13 @@ class AuthService {
     // Kiểm tra nếu người dùng tồn tại
     const user = await User.findOne({ email });
     if (!user) {
-      throw new Error('Người dùng không tồn tại');
+      throw new Error('User does not exist');
     }
 
     // So sánh mật khẩu
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      throw new Error('Mật khẩu không chính xác');
+      throw new Error('Password is incorrect');
     }
 
     // Tạo JWT token
@@ -46,7 +46,7 @@ class AuthService {
       { expiresIn: '10m' }
     );
 
-    return { token, message: 'Đăng nhập thành công' };
+    return { token, message: 'Log in successfully' };
   }
 }
 
